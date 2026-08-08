@@ -6,16 +6,18 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
 });
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
   display: "swap",
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
 });
 
 export const metadata: Metadata = {
-  title: "Relist — AI Resale Listing Agent",
+  title: "Relist — Multi-Platform Resale Studio",
   description: "Instant photo-in, listing-out appraisal & cross-platform copy generator for eBay, Poshmark, and Facebook Marketplace.",
 };
 

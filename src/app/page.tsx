@@ -17,28 +17,28 @@ import { RefreshCw, AlertCircle } from "lucide-react";
 const PIPELINE_STEPS_CONFIG: Omit<AgentStep, "status">[] = [
   {
     id: "step_photos",
-    label: "Analyzing your photos...",
-    subtext: "Gemini Multimodal Vision inspection across all uploaded angles",
+    label: "Inspecting item photos & labels",
+    subtext: "Detecting garment type, brand tags, materials, and hardware details",
   },
   {
     id: "step_condition",
-    label: "Assessing condition...",
-    subtext: "Evaluating wear, distressing, hardware, and buyer disclosure items",
+    label: "Evaluating condition & wear details",
+    subtext: "Grading wear level and identifying specific disclosure points",
   },
   {
     id: "step_price",
-    label: "Calculating fair price...",
-    subtext: "Analyzing secondary market pricing comps across resale platforms",
+    label: "Calculating recent market comps",
+    subtext: "Estimating fair secondary market valuation across resale channels",
   },
   {
     id: "step_listing",
-    label: "Writing your listing...",
-    subtext: "Drafting high-converting base description and keyword tags",
+    label: "Drafting search-friendly listing copy",
+    subtext: "Writing clear item description, specifications, and category tags",
   },
   {
     id: "step_platforms",
-    label: "Formatting for eBay, Poshmark & Facebook...",
-    subtext: "Enforcing character limits, platform tone, and negotiation strategies",
+    label: "Formatting for eBay, Poshmark & Marketplace",
+    subtext: "Tailoring character lengths, negotiation room, and local pickup terms",
   },
 ];
 
@@ -158,10 +158,10 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h1 className="font-heading font-bold text-2xl sm:text-3xl text-[#18181B] tracking-tight">
-              AI Resale Listing Studio
+              Create Resale Listings
             </h1>
             <p className="text-xs sm:text-sm text-[#71717A] mt-0.5">
-              Upload 1–4 item photos. Get condition appraisal, price comps, and multi-platform listings.
+              Upload 1–4 item photos to generate condition appraisal, price comps, and multi-platform listings.
             </p>
           </div>
 
@@ -205,18 +205,18 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Global Error Banner */}
+        {/* Error Banner */}
         {photoError && (
           <div className="flex items-start gap-2.5 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm animate-fade-in-slide">
             <AlertCircle className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
             <div className="space-y-0.5">
-              <span className="font-semibold">Generation Error</span>
+              <span className="font-semibold">Unable to Generate Listing</span>
               <p className="text-red-700">{photoError}</p>
             </div>
           </div>
         )}
 
-        {/* AGENT ORCHESTRATION TRACE OR REAL RESULTS */}
+        {/* PROGRESS / APPRAISAL STATE OR REAL RESULTS */}
         <section className="space-y-5">
           {isGenerating && agentSteps.length > 0 ? (
             <AgentTrace steps={agentSteps} />
@@ -234,7 +234,7 @@ export default function Home() {
 
       <footer className="w-full border-t border-[#EFECE6] bg-[#FFFFFF] py-4 mt-8">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between text-xs text-[#71717A] gap-2">
-          <span>Relist AI — Multi-Platform Resale Listing Studio</span>
+          <span>Relist — Multi-Platform Resale Listing Studio</span>
           <span className="text-[#A1A1AA]">Supports eBay, Poshmark, and Facebook Marketplace</span>
         </div>
       </footer>

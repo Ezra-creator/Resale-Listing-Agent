@@ -110,7 +110,7 @@ export const PlatformTabs: React.FC<PlatformTabsProps> = ({ platformListings }) 
           <CopyableField
             label="eBay Search Title"
             value={ebay.title}
-            characterCount={{ current: ebay.title.length, max: 80 }}
+            characterCount={{ max: 80 }}
             badgeText="80 Chars Max"
             badgeColorClass="bg-[#EBF1F5] text-[#335368]"
           />
@@ -150,7 +150,7 @@ export const PlatformTabs: React.FC<PlatformTabsProps> = ({ platformListings }) 
           <CopyableField
             label="Poshmark Clean Title"
             value={poshmark.title}
-            characterCount={{ current: poshmark.title.length, max: 50 }}
+            characterCount={{ max: 50 }}
             badgeText="50 Chars Max"
             badgeColorClass="bg-[#F8EEF2] text-[#6D2844]"
           />
@@ -181,7 +181,7 @@ export const PlatformTabs: React.FC<PlatformTabsProps> = ({ platformListings }) 
           <CopyableField
             label="Local Marketplace Title"
             value={fb.title}
-            characterCount={{ current: fb.title.length, max: 100 }}
+            characterCount={{ max: 100 }}
             badgeText="100 Chars Max"
             badgeColorClass="bg-[#EDF5FA] text-[#1B4B73]"
           />

@@ -30,10 +30,10 @@ export async function generateResaleListingAction(formData: FormData): Promise<R
   const groqKey = process.env.GROQ_API_KEY;
 
   if (!geminiKey || geminiKey.includes("your_gemini_api_key")) {
-    throw new Error("GEMINI_API_KEY is not configured. Please add your key to the .env file.");
+    throw new Error("Missing Gemini API Key. Please add GEMINI_API_KEY to your .env file.");
   }
   if (!groqKey || groqKey.includes("your_groq_api_key")) {
-    throw new Error("GROQ_API_KEY is not configured. Please add your key to the .env file.");
+    throw new Error("Missing Groq API Key. Please add GROQ_API_KEY to your .env file.");
   }
 
   const notes = (formData.get("notes") as string) || "";
@@ -43,7 +43,7 @@ export async function generateResaleListingAction(formData: FormData): Promise<R
     throw new Error("Please upload at least 1 item photo.");
   }
   if (files.length > 4) {
-    throw new Error("A maximum of 4 photos can be analyzed at once.");
+    throw new Error("Maximum of 4 photos allowed per item.");
   }
 
   // Process and validate real image buffers
@@ -58,7 +58,7 @@ export async function generateResaleListingAction(formData: FormData): Promise<R
 
     let mime = file.type || detectMimeType(buffer);
     if (!mime || !ALLOWED_MIME_TYPES.includes(mime)) {
-      throw new Error(`"${file.name}" is not a supported format. Only JPG, PNG, and WebP are allowed.`);
+      throw new Error(`"${file.name}" is unsupported. Please upload JPG, PNG, or WebP.`);
     }
 
     imageParts.push({
@@ -72,7 +72,7 @@ export async function generateResaleListingAction(formData: FormData): Promise<R
   const genAI = new GoogleGenerativeAI(geminiKey);
   const groq = new Groq({ apiKey: groqKey });
 
-  // STEP 1: Gemini Multimodal Vision Analysis
+  // STEP 1: Vision Analysis
   const visionModel = genAI.getGenerativeModel({
     model: VISION_MODEL,
     generationConfig: {
@@ -96,20 +96,19 @@ export async function generateResaleListingAction(formData: FormData): Promise<R
     },
   });
 
-  const visionPrompt = `You are a professional resale appraisal expert.
-You are given ${imageParts.length} photo(s) of the SAME SINGLE ITEM from various angles (front, back, labels, hardware, flaws).
+  const visionPrompt = `Analyze these photos of a single resale item.
 Extract:
-1. item_type: Specific garment or item classification (e.g. Leather Bomber Jacket, High-Top Sneakers).
-2. brand: Brand name identified on tags or logos (or null if unbranded).
+1. item_type: Concise, accurate product classification (e.g. Leather Bomber Jacket, High-Top Canvas Sneakers).
+2. brand: Brand name identified on tag, hardware, or print (null if unbranded).
 3. color: Dominant colors.
-4. material: Primary material (e.g. Genuine Leather, Cotton, Suede, Denim) or null.
-5. visible_condition_notes: Array of specific observations across all photos (creasing, distressing, edge wear, hardware condition, tags).
-6. estimated_category: Standard e-commerce category hierarchy.`;
+4. material: Primary material (e.g. Full-Grain Leather, 100% Cotton, Denim) or null.
+5. visible_condition_notes: Specific observations regarding signs of wear, distressing, hardware function, stitching, and tags.
+6. estimated_category: Standard retail category.`;
 
   const visionResult = await visionModel.generateContent([...imageParts, visionPrompt]);
   const itemAnalysis = JSON.parse(visionResult.response.text());
 
-  // STEP 2: Condition Assessment & Buyer Disclosures
+  // STEP 2: Condition Grade & Wear Details
   const conditionModel = genAI.getGenerativeModel({
     model: VISION_MODEL,
     generationConfig: {
@@ -134,25 +133,25 @@ Extract:
   });
 
   const conditionPrompt = `Based on these item observations:
-Visual condition notes:
+Visual notes:
 ${(itemAnalysis.visible_condition_notes || []).map((n: string) => `• ${n}`).join("\n")}
 
-Seller's additional notes:
+Seller notes:
 ${notes || "None provided."}
 
-Assign exactly one condition grade from: 'New with tags', 'Like new', 'Good', 'Fair', 'Worn'.
-List flaws to disclose to buyers for full transparency.`;
+Assign exactly one standard grade: 'New with tags', 'Like new', 'Good', 'Fair', or 'Worn'.
+List any specific flaws or wear points buyers will want to know about before purchasing.`;
 
   const conditionResult = await conditionModel.generateContent([conditionPrompt]);
   const conditionData = JSON.parse(conditionResult.response.text());
 
-  // STEP 3: Groq Secondary Market Price Comps
+  // STEP 3: Market Pricing Comps
   const priceCompletion = await groq.chat.completions.create({
     model: TEXT_MODEL,
     messages: [
       {
         role: "system",
-        content: `You are a resale market pricing strategist analyzing real secondary market comps on eBay, Poshmark, and Grailed. Return JSON matching:
+        content: `You are a resale market pricing specialist. Estimate fair secondary market comps in USD based on recent sales. Return JSON matching:
 {
   "price_range": {
     "low": number,
@@ -164,12 +163,12 @@ List flaws to disclose to buyers for full transparency.`;
       },
       {
         role: "user",
-        content: `Item Type: ${itemAnalysis.item_type}
-Brand: ${itemAnalysis.brand || "Unbranded / Unknown"}
-Condition Grade: ${conditionData.condition_grade}
+        content: `Item: ${itemAnalysis.item_type}
+Brand: ${itemAnalysis.brand || "Unbranded"}
+Condition: ${conditionData.condition_grade}
 Material: ${itemAnalysis.material || "Standard"}
 
-Provide fair secondary market price range and optimal target listing price in USD.`,
+Provide fair price range and target price.`,
       },
     ],
     response_format: { type: "json_object" },
@@ -177,18 +176,18 @@ Provide fair secondary market price range and optimal target listing price in US
   });
   const priceData = JSON.parse(priceCompletion.choices[0]?.message?.content || "{}");
 
-  // STEP 4: Groq Base Listing Copy & SEO Tags
+  // STEP 4: High-Converting Seller Listing Copy
   const listingCompletion = await groq.chat.completions.create({
     model: TEXT_MODEL,
     messages: [
       {
         role: "system",
-        content: `You are an elite e-commerce resale copywriter. Return JSON matching:
+        content: `You are an experienced top-rated reseller. Write a clean, natural listing that feels written by a real human seller. Avoid robotic headings like "OVERVIEW:" or "ITEM SPECIFICATIONS:". Write clear descriptive paragraphs followed by specs. Return JSON:
 {
-  "title": string (keyword-rich, under 80 chars),
-  "description": string (structured, highlighting materials, condition, styling),
+  "title": string (search-friendly, under 80 chars),
+  "description": string (natural, informative, seller-style copy),
   "category": string,
-  "tags": string[] (5-8 relevant search tags)
+  "tags": string[]
 }`,
       },
       {
@@ -197,9 +196,8 @@ Provide fair secondary market price range and optimal target listing price in US
 Brand: ${itemAnalysis.brand || "Unbranded"}
 Color: ${itemAnalysis.color}
 Material: ${itemAnalysis.material || "Standard"}
-Condition: ${conditionData.condition_grade} (${conditionData.condition_reasoning})
-Flaws: ${(conditionData.flaws_to_disclose || []).join("; ")}
-Price Range: $${priceData.price_range?.low} - $${priceData.price_range?.high} (Suggested: $${priceData.price_range?.suggested})`,
+Condition: ${conditionData.condition_grade}
+Notes/Flaws: ${(conditionData.flaws_to_disclose || []).join(", ")}`,
       },
     ],
     response_format: { type: "json_object" },
@@ -207,42 +205,49 @@ Price Range: $${priceData.price_range?.low} - $${priceData.price_range?.high} (S
   });
   const baseListing = JSON.parse(listingCompletion.choices[0]?.message?.content || "{}");
 
-  // STEP 5: Groq Platform Adaptation (eBay, Poshmark, FB Marketplace)
+  // STEP 5: Platform-Specific Tailored Copy
   const platformCompletion = await groq.chat.completions.create({
     model: TEXT_MODEL,
     messages: [
       {
         role: "system",
-        content: `You are a cross-platform marketplace formatting specialist. Format the listing into three platform-specific versions. Return JSON matching:
+        content: `You are an expert reseller tailoring a product listing for eBay, Poshmark, and Facebook Marketplace.
+
+STYLE GUIDELINES (DO NOT SOUND LIKE AN AI):
+- eBay: Title under 80 characters (keyword-frontloaded with brand, style, size/color, condition). Description should be clean and concise with key details and condition notes.
+- Poshmark: Title under 50 characters. Description should be friendly, clear, and mention closet bundle discounts. DO NOT OVER-USE EMOJIS (maximum 1 or 2 subtle emojis total, do not stuff every sentence).
+- Facebook Marketplace: Title under 100 characters. Clean description with cash/Venmo upon pickup, smoke-free home mention, local area pickup terms. NO hashtags.
+
+Return JSON:
 {
   "ebay": {
-    "title": string (max 80 chars, keyword-frontloaded),
-    "description": string (structured with bullet specs and condition details),
-    "category_suggestion": string (eBay taxonomy path),
-    "suggested_price": number (higher end of price range for Best Offer negotiation)
+    "title": string (max 80 chars),
+    "description": string,
+    "category_suggestion": string,
+    "suggested_price": number
   },
   "poshmark": {
-    "title": string (max 50 chars, casual/friendly with emojis),
-    "description": string (conversational, includes bundle discount and styling callouts),
-    "category_suggestion": string (Poshmark category path),
-    "suggested_price": number (marked up for Offer to Likers drops)
+    "title": string (max 50 chars),
+    "description": string,
+    "category_suggestion": string,
+    "suggested_price": number
   },
   "facebook_marketplace": {
-    "title": string (max 100 chars, straightforward with size/color),
-    "description": string (local pickup, cash/Venmo terms, smoke-free home note, NO hashtags),
-    "suggested_price": number (realistic cash target)
+    "title": string (max 100 chars),
+    "description": string,
+    "suggested_price": number
   }
 }`,
       },
       {
         role: "user",
-        content: `Item Type: ${itemAnalysis.item_type}
+        content: `Item: ${itemAnalysis.item_type}
 Brand: ${itemAnalysis.brand || "Unbranded"}
-Base Title: ${baseListing.title}
-Base Description: ${baseListing.description}
+Color: ${itemAnalysis.color}
+Material: ${itemAnalysis.material || "Standard"}
 Condition: ${conditionData.condition_grade}
 Flaws: ${(conditionData.flaws_to_disclose || []).join(", ")}
-Price Range: Low: $${priceData.price_range?.low}, High: $${priceData.price_range?.high}, Suggested: $${priceData.price_range?.suggested}`,
+Price Comps: Low $${priceData.price_range?.low}, High $${priceData.price_range?.high}, Target $${priceData.price_range?.suggested}`,
       },
     ],
     response_format: { type: "json_object" },
