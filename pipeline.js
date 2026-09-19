@@ -293,10 +293,9 @@ export const agentTools = [
         properties: {
           photo_session_id: {
             type: "string",
-            description: "Session identifier for the uploaded photos (uses active session context)."
+            description: "Session identifier for the uploaded photos."
           }
-        },
-        required: []
+        }
       }
     }
   },

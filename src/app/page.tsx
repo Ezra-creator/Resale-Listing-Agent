@@ -112,9 +112,15 @@ export default function Home() {
       }
 
       // Execute real Server Action with Gemini Vision and Groq LLM
-      const data = await generateResaleListingAction(formData);
+      const result = await generateResaleListingAction(formData);
 
       clearInterval(stepInterval);
+
+      if (!result.success) {
+        setPhotoError(result.error);
+        setAgentSteps([]);
+        return;
+      }
 
       // Mark all steps done
       setAgentSteps((prev) =>
@@ -126,11 +132,11 @@ export default function Home() {
 
       // Smooth ~250ms transition to results reveal
       await new Promise((r) => setTimeout(r, 250));
-      setReport(data);
+      setReport(result.data);
     } catch (err: any) {
       clearInterval(stepInterval);
       console.error("Listing generation error:", err);
-      setPhotoError(err.message || "An unexpected error occurred while analyzing photos.");
+      setPhotoError(err?.message || "An unexpected error occurred while analyzing photos.");
       setAgentSteps([]);
     } finally {
       setIsGenerating(false);

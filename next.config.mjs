@@ -2,6 +2,9 @@
 const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@google/generative-ai", "groq-sdk"],
+    serverActions: {
+      bodySizeLimit: "25mb",
+    },
   },
 };
 
