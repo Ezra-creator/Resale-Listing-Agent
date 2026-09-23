@@ -4,7 +4,7 @@ import Groq from "groq-sdk";
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 if (!GROQ_API_KEY) {
-  console.error("❌ Error: GROQ_API_KEY is not set in environment or .env file.");
+  console.error("[ERROR] GROQ_API_KEY is not set in environment or .env file.");
   process.exit(1);
 }
 
@@ -29,18 +29,18 @@ async function listGroqModels() {
     const llama33 = models.find((m) => m.id.includes("llama-3.3-70b-versatile"));
     console.log("\n=== TARGET MODEL CHECK: llama-3.3-70b-versatile ===");
     if (llama33) {
-      console.log(`✅ "llama-3.3-70b-versatile" is ACTIVE and AVAILABLE on Groq!`);
+      console.log(`[OK] "llama-3.3-70b-versatile" is ACTIVE and AVAILABLE on Groq!`);
       console.log(`   - Context window: ${llama33.context_window} tokens`);
       console.log(`   - Owned by: ${llama33.owned_by}`);
     } else {
-      console.log(`⚠️ "llama-3.3-70b-versatile" was not found in active models.`);
+      console.log(`[WARN] "llama-3.3-70b-versatile" was not found in active models.`);
       const alternativeLlamas = models.filter((m) => m.id.includes("llama"));
       console.log("Available alternatives:", alternativeLlamas.map((m) => m.id).join(", "));
     }
 
     return models;
   } catch (error) {
-    console.error("❌ Failed to list Groq models:", error.message);
+    console.error("[ERROR] Failed to list Groq models:", error.message);
     process.exit(1);
   }
 }

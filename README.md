@@ -4,13 +4,13 @@
 
 ---
 
-## 📸 Demo
+## Demo
 
 ![Relist AI Resale Studio Interface](./docs/demo-screenshot.png)
 
 ---
 
-## 🏛️ Why This Architecture?
+## Why This Architecture?
 
 ### 1. Hybrid Model Strategy (Gemini Vision + Groq Text Reasoning)
 Rather than relying on a single monolithic model for all steps, this pipeline divides tasks by optimal modality and economics:
@@ -36,12 +36,12 @@ Text-based LLMs cannot accept raw binary image buffers as JSON function-call arg
 
 ### 4. Decoupled Platform Adaptation Layer
 Core item analysis (`item_type`, `brand`, `condition_grade`, `flaws_to_disclose`, `price_range`) is strictly decoupled from platform-specific copy generation.
-- **Separation of Concerns**: eBay requires 80-character keyword-frontloaded titles and structured specs; Poshmark favors 50-character casual titles with emojis and bundle discount callouts; Facebook Marketplace requires local pickup/cash terms with no hashtags.
+- **Separation of Concerns**: eBay requires 80-character keyword-frontloaded titles and structured specs; Poshmark favors 50-character casual titles with bundle discount callouts; Facebook Marketplace requires local pickup/cash terms with no hashtags.
 - Platform conventions and character limits change frequently. Decoupling the platform layer allows marketplace formats to evolve without invalidating the foundational item appraisal.
 
 ---
 
-## 📐 Architecture Flow
+## Architecture Flow
 
 ```mermaid
 flowchart TD
@@ -86,7 +86,7 @@ flowchart TD
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js 14 (App Router), React 18, Tailwind CSS, Lucide Icons
 - **Typography**: Space Grotesk (Headings) & Inter (UI/Body) via `next/font/google`
@@ -96,7 +96,7 @@ flowchart TD
 
 ---
 
-## 🚀 Local Setup & Installation
+## Local Setup & Installation
 
 ### 1. Clone & Install Dependencies
 ```bash
@@ -136,7 +136,7 @@ node pipeline.js --verbose
 
 ---
 
-## 🛡️ Production Roadmap & Engineering Considerations
+## Production Roadmap & Engineering Considerations
 
 If scaling this system into a multi-tenant public production product, the following additions would be prioritized:
 
@@ -148,6 +148,6 @@ If scaling this system into a multi-tenant public production product, the follow
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](./LICENSE).

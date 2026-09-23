@@ -262,7 +262,7 @@ Notes/Flaws: ${(conditionData.flaws_to_disclose || []).join(", ")}`,
 
 STYLE GUIDELINES (DO NOT SOUND LIKE AN AI):
 - eBay: Title under 80 characters (keyword-frontloaded with brand, style, size/color, condition). Description should be clean and concise with key details and condition notes.
-- Poshmark: Title under 50 characters. Description should be friendly, clear, and mention closet bundle discounts. Max 1 or 2 emojis total.
+- Poshmark: Title under 50 characters. Description should be friendly, clear, and mention closet bundle discounts. Clean professional copy without emojis.
 - Facebook Marketplace: Title under 100 characters. Clean description with cash/Venmo upon pickup, smoke-free home mention, local area pickup terms. NO hashtags.
 
 Return ONLY JSON:

@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag, TrendingUp, Sparkles, CheckCircle2 } from "lucide-react";
+import { Tag, TrendingUp, Sparkles, CheckCircle2, Info } from "lucide-react";
 import { ResaleReport, ConditionGrade } from "../types/listing";
 
 interface ResultsSummaryProps {
@@ -23,6 +23,18 @@ function getConditionBadgeStyle(grade: ConditionGrade): { bg: string; text: stri
   }
 }
 
+function renderConditionIcon(grade: ConditionGrade) {
+  switch (grade) {
+    case "New with tags":
+      return <Sparkles className="w-3 h-3 mr-1 shrink-0 text-emerald-600" />;
+    case "Like new":
+    case "Good":
+      return <CheckCircle2 className="w-3 h-3 mr-1 shrink-0 text-emerald-600" />;
+    default:
+      return <Info className="w-3 h-3 mr-1 shrink-0 text-amber-600" />;
+  }
+}
+
 export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ report }) => {
   const badgeStyle = getConditionBadgeStyle(report.condition_grade);
 
@@ -38,9 +50,10 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ report }) => {
               </span>
             )}
             <span
-              className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badgeStyle.bg} ${badgeStyle.text} ${badgeStyle.border}`}
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badgeStyle.bg} ${badgeStyle.text} ${badgeStyle.border}`}
             >
-              {report.condition_grade} Condition
+              {renderConditionIcon(report.condition_grade)}
+              <span>{report.condition_grade} Condition</span>
             </span>
           </div>
 
@@ -51,8 +64,9 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ report }) => {
 
         {/* Suggested Price Callout */}
         <div className="sm:text-right shrink-0 bg-[#FDF2EF] sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border border-[#F5C7B8] sm:border-none">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1AA]">
-            Suggested Target
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1AA] flex items-center sm:justify-end gap-1">
+            <TrendingUp className="w-3 h-3 text-[#E8623D]" />
+            <span>Suggested Target</span>
           </div>
           <div className="font-heading font-bold text-2xl sm:text-3xl text-[#E8623D]">
             ${report.price_range?.suggested || 0}

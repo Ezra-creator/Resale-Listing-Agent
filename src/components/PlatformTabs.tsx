@@ -58,7 +58,7 @@ export const PlatformTabs: React.FC<PlatformTabsProps> = ({ platformListings }) 
               activeTab === "poshmark" ? "bg-white/20 text-white" : "bg-[#E6DFD5] text-[#52525B]"
             }`}
           >
-            Closet & Emojis
+            Closet & Styling
           </span>
         </button>
 
@@ -131,7 +131,7 @@ export const PlatformTabs: React.FC<PlatformTabsProps> = ({ platformListings }) 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl bg-[#FAF0F4] border border-[#E9D2DC] gap-2 text-xs">
             <div className="text-[#6D2844]">
               <span className="font-semibold text-[#541B32]">Poshmark Strategy: </span>
-              Conversational emoji tone, closet bundle discounts & room for &quot;Offer to Likers&quot; drops.
+              Conversational buyer-friendly tone, closet bundle discounts & room for &quot;Offer to Likers&quot; drops.
             </div>
             <div className="font-heading font-bold text-base text-[#541B32] shrink-0">
               List at ${poshmark.suggested_price}

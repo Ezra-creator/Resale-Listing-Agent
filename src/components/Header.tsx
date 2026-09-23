@@ -1,12 +1,13 @@
 import React from "react";
+import { Tag } from "lucide-react";
 
 export const Header: React.FC = () => {
   return (
     <header className="w-full border-b border-[#EBE7DF] bg-[#FFFFFF] sticky top-0 z-30">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#E8623D] flex items-center justify-center shadow-xs text-white font-heading font-bold text-lg tracking-tight select-none">
-            R
+          <div className="w-8 h-8 rounded-lg bg-[#E8623D] flex items-center justify-center shadow-xs text-white select-none">
+            <Tag className="w-4 h-4 text-white" />
           </div>
           <div className="flex items-center gap-2">
             <span className="font-heading font-bold text-xl tracking-tight text-[#18181B]">

@@ -218,7 +218,7 @@ Adapt the provided item and listing into 3 platform-specific formats matching th
 
 2. poshmark:
    - title: Max 50 characters. Friendly, clean, and catchy.
-   - description: Conversational tone, relevant emojis used tastefully (✨, 🧥, etc.), mentions bundle/closet discount culture ("Bundle & save! Fast shipping! Open to reasonable offers!"), highlights styling.
+   - description: Conversational tone, polished and engaging, mentions bundle/closet discount culture ("Bundle & save! Fast shipping! Open to reasonable offers!"), highlights styling.
    - category_suggestion: Poshmark taxonomy path (e.g., "Men > Jackets & Coats > Bomber Jackets").
    - suggested_price: Number in USD, listed slightly higher than target to allow room for "Offer to Likers" discounts.
 
@@ -261,17 +261,17 @@ Format this listing for eBay, Poshmark, and Facebook Marketplace.`;
 
   // Enforce character limits in code with warnings
   if (result.ebay?.title && result.ebay.title.length > EBAY_TITLE_MAX) {
-    console.warn(`⚠️ [Character Limit] eBay title exceeded ${EBAY_TITLE_MAX} chars (${result.ebay.title.length}). Truncating.`);
+    console.warn(`[WARN] [Character Limit] eBay title exceeded ${EBAY_TITLE_MAX} chars (${result.ebay.title.length}). Truncating.`);
     result.ebay.title = result.ebay.title.slice(0, EBAY_TITLE_MAX).trim();
   }
 
   if (result.poshmark?.title && result.poshmark.title.length > POSHMARK_TITLE_MAX) {
-    console.warn(`⚠️ [Character Limit] Poshmark title exceeded ${POSHMARK_TITLE_MAX} chars (${result.poshmark.title.length}). Truncating.`);
+    console.warn(`[WARN] [Character Limit] Poshmark title exceeded ${POSHMARK_TITLE_MAX} chars (${result.poshmark.title.length}). Truncating.`);
     result.poshmark.title = result.poshmark.title.slice(0, POSHMARK_TITLE_MAX).trim();
   }
 
   if (result.facebook_marketplace?.title && result.facebook_marketplace.title.length > FB_TITLE_MAX) {
-    console.warn(`⚠️ [Character Limit] Facebook Marketplace title exceeded ${FB_TITLE_MAX} chars (${result.facebook_marketplace.title.length}). Truncating.`);
+    console.warn(`[WARN] [Character Limit] Facebook Marketplace title exceeded ${FB_TITLE_MAX} chars (${result.facebook_marketplace.title.length}). Truncating.`);
     result.facebook_marketplace.title = result.facebook_marketplace.title.slice(0, FB_TITLE_MAX).trim();
   }
 
@@ -452,7 +452,7 @@ function formatToolResultLog(name, result) {
  */
 export async function runAgentLoop({ images, userNotes = "", maxIterations = 8, verbose = false }) {
   console.log("===============================================================");
-  console.log("🤖 RESALE LISTING AGENT — FUNCTION-CALLING ORCHESTRATOR");
+  console.log("[AGENT] RESALE LISTING AGENT — FUNCTION-CALLING ORCHESTRATOR");
   console.log(`   • Orchestrator Model:  Groq (${TEXT_MODEL})`);
   console.log(`   • Vision Tool Provider: Google Gemini (${VISION_MODEL})`);
   console.log(`   • Max Turns:           ${maxIterations}`);
@@ -524,7 +524,7 @@ Seller Notes: "${sessionContext.userNotes || "None provided"}"`
 
     // If Groq did not request any tool calls, the agent has finished its work
     if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
-      console.log(`💬 [Agent Response]: ${assistantMessage.content || "Listing generation completed."}\n`);
+      console.log(`[AGENT RESPONSE]: ${assistantMessage.content || "Listing generation completed."}\n`);
       break;
     }
 
@@ -604,7 +604,7 @@ Seller Notes: "${sessionContext.userNotes || "None provided"}"`
           content: JSON.stringify(result)
         });
       } catch (toolError) {
-        console.error(`❌ Error executing tool "${funcName}":`, toolError.message);
+        console.error(`[ERROR] Error executing tool "${funcName}":`, toolError.message);
         messages.push({
           role: "tool",
           tool_call_id: toolCall.id,
@@ -616,7 +616,7 @@ Seller Notes: "${sessionContext.userNotes || "None provided"}"`
   }
 
   if (iteration >= maxIterations) {
-    console.warn(`⚠️ [WARNING] Agent reached the maximum limit of ${maxIterations} turns.`);
+    console.warn(`[WARN] Agent reached the maximum limit of ${maxIterations} turns.`);
   }
 
   // Construct consolidated final report including platform_listings
@@ -634,7 +634,7 @@ Seller Notes: "${sessionContext.userNotes || "None provided"}"`
   };
 
   console.log("===============================================================");
-  console.log("📋 CONSOLIDATED RESALE LISTING REPORT");
+  console.log("[REPORT] CONSOLIDATED RESALE LISTING REPORT");
   console.log("===============================================================");
   console.log(JSON.stringify(consolidatedReport, null, 2));
 
@@ -642,11 +642,11 @@ Seller Notes: "${sessionContext.userNotes || "None provided"}"`
   if (sessionContext.platformListings) {
     const pl = sessionContext.platformListings;
     console.log("\n===============================================================");
-    console.log("🏪 PLATFORM-SPECIFIC LISTINGS COMPARISON");
+    console.log("[PLATFORMS] PLATFORM-SPECIFIC LISTINGS COMPARISON");
     console.log("===============================================================");
 
     if (pl.ebay) {
-      console.log("\n🔵 [EBAY] — Search-Optimized & Structured Factual");
+      console.log("\n[EBAY] — Search-Optimized & Structured Factual");
       console.log(`   • Title (${pl.ebay.title?.length || 0}/80 chars): ${pl.ebay.title}`);
       console.log(`   • Suggested Price:   $${pl.ebay.suggested_price} (Targeted higher for Best Offer / negotiation)`);
       console.log(`   • Category Path:     ${pl.ebay.category_suggestion}`);
@@ -659,7 +659,7 @@ Seller Notes: "${sessionContext.userNotes || "None provided"}"`
     }
 
     if (pl.poshmark) {
-      console.log("\n🟣 [POSHMARK] — Conversational, Emojis & Bundle-Friendly");
+      console.log("\n[POSHMARK] — Conversational & Bundle-Friendly");
       console.log(`   • Title (${pl.poshmark.title?.length || 0}/50 chars): ${pl.poshmark.title}`);
       console.log(`   • Suggested Price:   $${pl.poshmark.suggested_price} (Listed higher for Closet Drops & Offers to Likers)`);
       console.log(`   • Category Path:     ${pl.poshmark.category_suggestion}`);
@@ -672,7 +672,7 @@ Seller Notes: "${sessionContext.userNotes || "None provided"}"`
     }
 
     if (pl.facebook_marketplace) {
-      console.log("\n🌐 [FACEBOOK MARKETPLACE] — Direct Local Sale & Pickup Norms");
+      console.log("\n[FACEBOOK MARKETPLACE] — Direct Local Sale & Pickup Norms");
       console.log(`   • Title (${pl.facebook_marketplace.title?.length || 0}/100 chars): ${pl.facebook_marketplace.title}`);
       console.log(`   • Suggested Price:   $${pl.facebook_marketplace.suggested_price} (Set close to target cash price)`);
       console.log("   • Description (No hashtags, includes local pickup/cash callouts):");
@@ -685,7 +685,7 @@ Seller Notes: "${sessionContext.userNotes || "None provided"}"`
   }
 
   console.log("===============================================================");
-  console.log("✅ Agent loop completed successfully!\n");
+  console.log("[SUCCESS] Agent loop completed successfully!\n");
 
   return consolidatedReport;
 }
@@ -703,13 +703,13 @@ export async function main() {
     path.join("samples", "item3.jpg")
   ];
 
-  console.log("📂 Ingesting sample images into raw Buffers...");
+  console.log("[IO] Ingesting sample images into raw Buffers...");
   const samplePhotoBuffers = samplePhotoFiles.map((p) => {
     if (!fs.existsSync(p)) {
       throw new Error(`Sample photo file not found: "${p}". Please ensure samples/ contains test images.`);
     }
     const buf = fs.readFileSync(p);
-    console.log(`   📄 Loaded "${p}" (${(buf.length / 1024).toFixed(1)} KB buffer)`);
+    console.log(`   [FILE] Loaded "${p}" (${(buf.length / 1024).toFixed(1)} KB buffer)`);
     return buf;
   });
 
@@ -723,7 +723,7 @@ export async function main() {
       verbose: isVerbose
     });
   } catch (error) {
-    console.error("\n❌ Agent Pipeline Execution Failed:");
+    console.error("\n[ERROR] Agent Pipeline Execution Failed:");
     console.error(error.message);
     if (error.stack && isVerbose) {
       console.error("\nStack Trace:\n", error.stack);

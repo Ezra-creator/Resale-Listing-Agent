@@ -3,7 +3,7 @@ import "dotenv/config";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 if (!GEMINI_API_KEY) {
-  console.error("❌ Error: GEMINI_API_KEY is not set in environment or .env file.");
+  console.error("[ERROR] GEMINI_API_KEY is not set in environment or .env file.");
   process.exit(1);
 }
 
@@ -59,7 +59,7 @@ async function listGeminiModels() {
 
     return visionCapableModels;
   } catch (error) {
-    console.error("❌ Failed to list Gemini models:", error.message);
+    console.error("[ERROR] Failed to list Gemini models:", error.message);
     process.exit(1);
   }
 }
