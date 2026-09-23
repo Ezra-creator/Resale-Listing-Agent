@@ -79,30 +79,7 @@ export default function Home() {
     }));
     setAgentSteps(initialSteps);
 
-    // Progressive step indicator timer during real LLM execution
-    let currentStepIndex = 0;
-    const stepInterval = setInterval(() => {
-      currentStepIndex++;
-      if (currentStepIndex < initialSteps.length) {
-        setAgentSteps((prev) =>
-          prev.map((s, idx) => ({
-            ...s,
-            status: idx < currentStepIndex ? "done" : idx === currentStepIndex ? "active" : "pending",
-          }))
-        );
-      }
-    }, 1800);
-
-    // Set first step active immediately
-    setAgentSteps((prev) =>
-      prev.map((s, idx) => ({
-        ...s,
-        status: idx === 0 ? "active" : "pending",
-      }))
-    );
-
     try {
-      // Build real multipart form data with real user files
       const formData = new FormData();
       photos.forEach((photo) => {
         formData.append("photos", photo.file);
@@ -111,30 +88,72 @@ export default function Home() {
         formData.append("notes", notes.trim());
       }
 
-      // Execute real Server Action with Gemini Vision and Groq LLM
-      const result = await generateResaleListingAction(formData);
+      // Connect to real-time streaming endpoint
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        body: formData,
+      });
 
-      clearInterval(stepInterval);
-
-      if (!result.success) {
-        setPhotoError(result.error);
-        setAgentSteps([]);
+      if (!res.ok || !res.body) {
+        // Fallback to direct server action if streaming endpoint fails
+        const fallbackResult = await generateResaleListingAction(formData);
+        if (!fallbackResult.success) {
+          setPhotoError(fallbackResult.error);
+          setAgentSteps([]);
+          return;
+        }
+        setAgentSteps((prev) => prev.map((s) => ({ ...s, status: "done" })));
+        await new Promise((r) => setTimeout(r, 200));
+        setReport(fallbackResult.data);
         return;
       }
 
-      // Mark all steps done
-      setAgentSteps((prev) =>
-        prev.map((s) => ({
-          ...s,
-          status: "done",
-        }))
-      );
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
 
-      // Smooth ~250ms transition to results reveal
-      await new Promise((r) => setTimeout(r, 250));
-      setReport(result.data);
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith("data: ")) continue;
+
+          try {
+            const event = JSON.parse(trimmed.slice(6));
+
+            if (event.type === "step_start") {
+              const stepIndex = PIPELINE_STEPS_CONFIG.findIndex((s) => s.id === event.stepId);
+              setAgentSteps((prev) =>
+                prev.map((s, idx) => ({
+                  ...s,
+                  status: idx < stepIndex ? "done" : idx === stepIndex ? "active" : "pending",
+                }))
+              );
+            } else if (event.type === "step_done") {
+              setAgentSteps((prev) =>
+                prev.map((s) => (s.id === event.stepId ? { ...s, status: "done" } : s))
+              );
+            } else if (event.type === "result") {
+              setAgentSteps((prev) => prev.map((s) => ({ ...s, status: "done" })));
+              await new Promise((r) => setTimeout(r, 200));
+              setReport(event.data);
+            } else if (event.type === "error") {
+              setPhotoError(event.error);
+              setAgentSteps([]);
+              return;
+            }
+          } catch (parseErr) {
+            console.error("Failed to parse SSE line:", trimmed, parseErr);
+          }
+        }
+      }
     } catch (err: any) {
-      clearInterval(stepInterval);
       console.error("Listing generation error:", err);
       setPhotoError(err?.message || "An unexpected error occurred while analyzing photos.");
       setAgentSteps([]);

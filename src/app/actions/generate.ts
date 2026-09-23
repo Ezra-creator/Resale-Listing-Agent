@@ -229,10 +229,17 @@ Provide fair price range and target price.`,
       messages: [
         {
           role: "system",
-          content: `You are an experienced top-rated reseller. Write a clean, natural listing that feels written by a real human seller. Avoid robotic headings. Write clear descriptive paragraphs followed by specs. Return ONLY JSON:
+          content: `You are a top-rated individual reseller writing an authentic listing.
+STRICT ANTI-AI RULES:
+- NEVER use marketing buzzwords: "Elevate your wardrobe", "Must-have staple", "Timeless classic", "Turn heads", "Exquisite craftsmanship", "Chic piece", "Look no further", "Step out in style".
+- Write factual, clean, concise copy that buyers respect.
+- Start directly with the item brand, model, size, color, and physical specs.
+- Include structured specs (Brand, Size, Material, Condition, Approximate Measurements placeholder if not specified).
+
+Return ONLY JSON:
 {
   "title": string (search-friendly, under 80 chars),
-  "description": string (natural, informative, seller-style copy),
+  "description": string (natural human reseller copy),
   "category": string,
   "tags": string[]
 }`,
@@ -244,11 +251,12 @@ Brand: ${itemAnalysis.brand || "Unbranded"}
 Color: ${itemAnalysis.color}
 Material: ${itemAnalysis.material || "Standard"}
 Condition: ${conditionData.condition_grade}
-Notes/Flaws: ${(conditionData.flaws_to_disclose || []).join(", ")}`,
+Notes/Flaws: ${(conditionData.flaws_to_disclose || []).join(", ")}
+Seller Notes: ${notes}`,
         },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.3,
+      temperature: 0.25,
     });
     const baseListing = parseJsonClean(listingCompletion.choices[0]?.message?.content || "{}");
 
@@ -258,12 +266,25 @@ Notes/Flaws: ${(conditionData.flaws_to_disclose || []).join(", ")}`,
       messages: [
         {
           role: "system",
-          content: `You are an expert reseller tailoring a product listing for eBay, Poshmark, and Facebook Marketplace.
+          content: `You are an expert reseller adapting listings for eBay, Poshmark, and Facebook Marketplace.
 
-STYLE GUIDELINES (DO NOT SOUND LIKE AN AI):
-- eBay: Title under 80 characters (keyword-frontloaded with brand, style, size/color, condition). Description should be clean and concise with key details and condition notes.
-- Poshmark: Title under 50 characters. Description should be friendly, clear, and mention closet bundle discounts. Clean professional copy without emojis.
-- Facebook Marketplace: Title under 100 characters. Clean description with cash/Venmo upon pickup, smoke-free home mention, local area pickup terms. NO hashtags.
+AUTHENTIC PLATFORM GUIDELINES (DO NOT SOUND LIKE AN AI):
+
+1. EBAY (Max 80 char title):
+   - Title: Frontload high-value keywords for Cassini search (Brand + Style/Model + Gender/Fit + Size + Color + Material + Condition). NO filler words, NO punctuation spam.
+   - Description: Factual and structured. Item specifics list, condition disclosure, flat-lay measurement lines (Pit-to-pit, Length), and clean shipping note.
+
+2. POSHMARK (Max 50 char title):
+   - Title: Clean, max 50 chars. Clear brand and style.
+   - Description: Friendly reseller tone. Highlights styling / subcultures (#vintage, #streetwear, #minimalist). Mentions closet bundle discounts ("Bundle 2+ items from my closet for a discount! Open to reasonable offers & fast shipping."). NO emojis.
+
+3. FACEBOOK MARKETPLACE (Max 100 char title):
+   - Title: Plain English local title, under 100 chars.
+   - Description: Direct local terms:
+     "• Pickup in [Local Area] / Cash or Venmo upon pickup."
+     "• Smoke-free, pet-free home."
+     "• If this listing is up, it's still available."
+     NO hashtags.
 
 Return ONLY JSON:
 {
@@ -294,7 +315,8 @@ Color: ${itemAnalysis.color}
 Material: ${itemAnalysis.material || "Standard"}
 Condition: ${conditionData.condition_grade}
 Flaws: ${(conditionData.flaws_to_disclose || []).join(", ")}
-Price Comps: Low $${priceData.price_range?.low || 50}, High $${priceData.price_range?.high || 100}, Target $${priceData.price_range?.suggested || 75}`,
+Price Comps: Low $${priceData.price_range?.low || 45}, High $${priceData.price_range?.high || 95}, Target $${priceData.price_range?.suggested || 70}
+Seller Notes: ${notes}`,
         },
       ],
       response_format: { type: "json_object" },
