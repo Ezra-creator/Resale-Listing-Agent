@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShoppingBag, Heart, Store, Sparkles, HelpCircle } from "lucide-react";
+import { ShoppingBag, Heart, Store } from "lucide-react";
 import { PlatformListingsMap } from "../types/listing";
 import { CopyableField } from "./CopyableField";
 

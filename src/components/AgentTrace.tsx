@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Search } from "lucide-react";
 import { AgentStep } from "../types/listing";
 
 interface AgentTraceProps {
@@ -16,7 +16,7 @@ export const AgentTrace: React.FC<AgentTraceProps> = ({ steps }) => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-[#F0EBE1]">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-[#FDF2EF] border border-[#F5C7B8] flex items-center justify-center text-[#E8623D]">
-            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+            <Search className="w-3.5 h-3.5" />
           </div>
           <div>
             <h3 className="font-heading font-bold text-base sm:text-lg text-[#18181B] tracking-tight">

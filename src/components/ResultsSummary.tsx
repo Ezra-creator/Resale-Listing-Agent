@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag, TrendingUp, Sparkles, CheckCircle2, Info } from "lucide-react";
+import { Tag, TrendingUp, CheckCircle2, Info } from "lucide-react";
 import { ResaleReport, ConditionGrade } from "../types/listing";
 
 interface ResultsSummaryProps {
@@ -26,7 +26,6 @@ function getConditionBadgeStyle(grade: ConditionGrade): { bg: string; text: stri
 function renderConditionIcon(grade: ConditionGrade) {
   switch (grade) {
     case "New with tags":
-      return <Sparkles className="w-3 h-3 mr-1 shrink-0 text-emerald-600" />;
     case "Like new":
     case "Good":
       return <CheckCircle2 className="w-3 h-3 mr-1 shrink-0 text-emerald-600" />;
