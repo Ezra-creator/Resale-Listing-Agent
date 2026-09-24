@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, Search } from "lucide-react";
+import { Check } from "lucide-react";
 import { AgentStep } from "../types/listing";
 
 interface AgentTraceProps {
@@ -14,18 +14,13 @@ export const AgentTrace: React.FC<AgentTraceProps> = ({ steps }) => {
     <div className="w-full bg-white rounded-2xl border border-[#E8E4DA] p-5 sm:p-6 shadow-warm space-y-5 animate-fade-in-slide">
       {/* Header with Title & Progress */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-[#F0EBE1]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-[#FDF2EF] border border-[#F5C7B8] flex items-center justify-center text-[#E8623D]">
-            <Search className="w-3.5 h-3.5" />
-          </div>
-          <div>
-            <h3 className="font-heading font-bold text-base sm:text-lg text-[#18181B] tracking-tight">
-              Appraising Your Item...
-            </h3>
-            <p className="text-xs text-[#71717A]">
-              Checking visual condition, recent sales comps, and drafting platform listings
-            </p>
-          </div>
+        <div>
+          <h3 className="font-heading font-bold text-base sm:text-lg text-[#18181B] tracking-tight">
+            Appraising Your Item...
+          </h3>
+          <p className="text-xs text-[#71717A]">
+            Checking visual condition, recent sales comps, and drafting platform listings
+          </p>
         </div>
 
         <div className="flex items-center gap-2.5">

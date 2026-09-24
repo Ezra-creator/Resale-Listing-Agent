@@ -257,12 +257,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="w-full border-t border-[#EFECE6] bg-[#FFFFFF] py-4 mt-8">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between text-xs text-[#71717A] gap-2">
-          <span>Relist — Multi-Platform Resale Listing Studio</span>
-          <span className="text-[#A1A1AA]">Supports eBay, Poshmark, and Facebook Marketplace</span>
-        </div>
-      </footer>
+
     </div>
   );
 }
